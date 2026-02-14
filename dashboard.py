@@ -252,3 +252,4 @@ with tab_performance:
         st.dataframe(weak)
     else:
         st.info("No data available.")
+
