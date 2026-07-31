@@ -15,6 +15,7 @@ import pandas as pd
 import streamlit as st
 
 from src import config, analytics, services, gemini, sample_data
+from src.learning import TutorMemory
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -61,6 +62,12 @@ st.markdown(f"*{config.APP_SUBTITLE}*")
 data, live = _load_data()
 frame = analytics.add_mastery(data)
 
+# ── Learning memory (self-training) ─────────────────────────────────────────
+if "tutor_memory" not in st.session_state:
+    st.session_state.tutor_memory = TutorMemory()
+
+memory = st.session_state.tutor_memory
+
 # ── Sidebar ────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("### 🧭 Status")
@@ -81,6 +88,7 @@ tabs = st.tabs([
     "🧠 AI Tutor",
     "✍️ Log Session",
     "⚙️ Performance",
+    "🧠 Learning",
     "📤 Export",
 ])
 
@@ -103,13 +111,13 @@ with tabs[0]:
 
         st.markdown("#### Mastery by course")
         course_mastery = analytics.topic_mastery(frame)
-        st.bar_chart(course_mastery.set_index(config.COURSE_COL))
+        st.bar_chart(course_mastery.set_index(analytics.COURSE_COL))
 
         st.markdown("#### Practice trend")
         trend = analytics.trend_series(frame)
         if not trend.empty:
-            trend[config.DATE_COL] = trend[config.DATE_COL].dt.strftime("%m-%d")
-            st.line_chart(trend.set_index(config.DATE_COL)[analytics.SCORE_COL])
+            trend[analytics.DATE_COL] = trend[analytics.DATE_COL].dt.strftime("%m-%d")
+            st.line_chart(trend.set_index(analytics.DATE_COL)[analytics.SCORE_COL])
 
         st.markdown("#### Score vs time invested")
         import matplotlib.pyplot as plt
@@ -192,6 +200,25 @@ with tabs[2]:
     if "chat" not in st.session_state:
         st.session_state.chat = []
 
+    # ── Learning preferences ────────────────────────────────────────────────
+    with st.expander("🧠 Tutor preferences (the AI learns these)"):
+        c1, c2, c3 = st.columns(3)
+        style = c1.selectbox("Style", ["concise", "balanced", "detailed"],
+                             index=["concise", "balanced", "detailed"].index(memory.data["preferences"].get("style", "balanced")),
+                             key="pref_style")
+        difficulty = c2.selectbox("Difficulty", ["gentle", "balanced", "advanced"],
+                                  index=["gentle", "balanced", "advanced"].index(memory.data["preferences"].get("difficulty", "balanced")),
+                                  key="pref_diff")
+        focus = c3.selectbox("Primary focus", ["weak topics", "exam prep", "deep understanding", "quick review"],
+                             index=["weak topics", "exam prep", "deep understanding", "quick review"].index(memory.data["preferences"].get("focus", "weak topics")),
+                             key="pref_focus")
+        if st.button("Save preferences"):
+            memory.set_preference("style", style)
+            memory.set_preference("difficulty", difficulty)
+            memory.set_preference("focus", focus)
+            memory.save()
+            st.success("Preferences saved — future answers will follow them.")
+
     for turn in st.session_state.chat:
         role = "🧑‍🎓 You" if turn["role"] == "user" else "🤖 Tutor"
         st.markdown(f"**{role}:**")
@@ -213,18 +240,72 @@ with tabs[2]:
             elif not with_context:
                 notes = ""
 
+            # Personalization context from the learned memory + analytics
+            weak = [f"{r[analytics.COURSE_COL]} — {r[analytics.TOPIC_COL]}"
+                    for r in analytics.weak_topics(frame).head(3).to_dict("records")]
+            personalization = memory.personalization_context(
+                weak_topics=weak, courses=memory.preferred_courses(3)
+            )
+
             answer = gemini.ask_gemini(
                 question=question.strip(),
                 notes=notes,
                 api_key=st.secrets.get("GEMINI_API_KEY", "") if _has_secrets() else "",
                 history=st.session_state.chat,
+                personalization=personalization,
             )
 
         st.session_state.chat.append({"role": "user", "content": question.strip()})
         st.session_state.chat.append({"role": "assistant", "content": answer})
+        st.session_state.last_answer = answer
+        st.session_state.last_question = question.strip()
+        st.session_state.show_feedback = True
 
         st.markdown("**🤖 Tutor:**")
         st.markdown(answer)
+
+    # ── Rating / correction feedback loop ───────────────────────────────────
+    if st.session_state.get("show_feedback") and st.session_state.get("last_answer"):
+        st.markdown("---")
+        st.markdown("**Did this answer help?** *(the tutor learns from your feedback)*")
+        rc1, rc2, rc3 = st.columns([1, 1, 3])
+        if rc1.button("👍 Good", key="rate_good"):
+            memory.record_interaction(
+                st.session_state.last_question,
+                st.session_state.last_answer,
+                course=st.session_state.get("last_course", ""),
+                topic=st.session_state.get("last_topic", ""),
+                rating=1,
+            )
+            st.session_state.show_feedback = False
+            st.rerun()
+        if rc2.button("👎 Needs work", key="rate_bad"):
+            memory.record_interaction(
+                st.session_state.last_question,
+                st.session_state.last_answer,
+                course=st.session_state.get("last_course", ""),
+                topic=st.session_state.get("last_topic", ""),
+                rating=-1,
+            )
+            st.session_state.show_feedback = False
+            st.rerun()
+        with rc3:
+            correction = st.text_input(
+                "Optional: what should the AI do differently? (e.g. 'use a "
+                "circuit diagram', 'shorter steps')",
+                key="correction_input",
+            )
+            if st.button("Save correction", key="save_correction"):
+                memory.record_interaction(
+                    st.session_state.last_question,
+                    st.session_state.last_answer,
+                    course=st.session_state.get("last_course", ""),
+                    topic=st.session_state.get("last_topic", ""),
+                    correction=correction,
+                )
+                st.session_state.show_feedback = False
+                st.success("Correction saved — the tutor will avoid this next time.")
+                st.rerun()
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -300,9 +381,60 @@ with tabs[4]:
 
 
 # ══════════════════════════════════════════════════════════════════════════
-# 6. Export
+# 6. Learning
 # ══════════════════════════════════════════════════════════════════════════
 with tabs[5]:
+    st.subheader("AI Learning Memory")
+
+    m = memory.stats()
+    lc1, lc2, lc3, lc4 = st.columns(4)
+    lc1.metric("Tutor sessions", m["sessions"])
+    lc2.metric("Ratings given", m["ratings"])
+    lc3.metric("Avg rating", f"{m['avg_rating']:.2f}" if m["avg_rating"] else "—")
+    lc4.metric("Learned rules", m["corrections"])
+
+    st.markdown("#### Learned preferences")
+    prefs = m["preferences"]
+    st.json({
+        "style": prefs.get("style"),
+        "difficulty": prefs.get("difficulty"),
+        "focus": prefs.get("focus"),
+        "courses": prefs.get("courses", [])[-5:],
+    })
+
+    st.markdown("#### Personalization context (injected into every AI prompt)")
+    weak = [f"{r[analytics.COURSE_COL]} — {r[analytics.TOPIC_COL]}"
+            for r in analytics.weak_topics(frame).head(3).to_dict("records")]
+    st.info(memory.personalization_context(weak_topics=weak,
+                                           courses=memory.preferred_courses(3)))
+
+    if m["corrections"]:
+        st.markdown("#### DO/AVOID rules you taught it")
+        st.dataframe(pd.DataFrame(memory.data["corrections"][-10:])[["ts", "rule"]],
+                     use_container_width=True)
+
+    st.markdown("---")
+    st.markdown("#### Backup & restore (free)")
+    st.download_button(
+        "⬇️ Download learning memory (JSON)",
+        data=memory.export_json(),
+        file_name=f"eee-tutor-memory-{dt.date.today().isoformat()}.json",
+        mime="application/json",
+    )
+    uploaded = st.file_uploader("Restore a memory backup", type=["json"])
+    if uploaded is not None:
+        try:
+            memory.import_json(uploaded.read().decode("utf-8"))
+            st.success("Learning memory restored.")
+            st.rerun()
+        except Exception as exc:
+            st.error(f"Could not restore memory: {exc}")
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# 7. Export
+# ══════════════════════════════════════════════════════════════════════════
+with tabs[6]:
     st.subheader("Export Data")
 
     if frame.empty:

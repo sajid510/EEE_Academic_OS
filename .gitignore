@@ -11,6 +11,9 @@ env/
 # Streamlit
 .streamlit/secrets.toml
 
+# Personal AI learning memory (user-specific, not committed)
+memory/
+
 # Editors / OS
 .vscode/
 .idea/

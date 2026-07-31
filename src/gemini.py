@@ -46,10 +46,13 @@ def build_prompt(question, notes, history=None):
     return {"system": system, "user": user}
 
 
-def ask_gemini(question, notes, api_key, model=None, history=None, timeout=60):
+def ask_gemini(question, notes, api_key, model=None, history=None, timeout=60,
+               personalization=None):
     """Call the Gemini generateContent endpoint and return the answer text.
 
     Returns a string on success or a user-friendly error string on failure.
+    ``personalization`` is a learned-context block merged into the system
+    prompt so answers become more customized over time.
     """
     model = model or config.GEMINI_MODEL
     if not api_key:
@@ -58,8 +61,15 @@ def ask_gemini(question, notes, api_key, model=None, history=None, timeout=60):
     prompt = build_prompt(question, notes, history=history)
     url = config.GEMINI_ENDPOINT.format(model=model)
 
+    system_text = prompt["system"]
+    if personalization:
+        system_text += (
+            "\n\nPERSONALIZATION (learned from past sessions — follow these "
+            f"preferences):\n{personalization}"
+        )
+
     payload = {
-        "system_instruction": {"parts": [{"text": prompt["system"]}]},
+        "system_instruction": {"parts": [{"text": system_text}]},
         "contents": [{"parts": [{"text": prompt["user"]}]}],
         "generationConfig": {
             "temperature": 0.3,

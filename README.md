@@ -18,6 +18,7 @@ undergraduates — built with Streamlit and your own Google Workspace.
 | 🧠 **AI Tutor** | Gemini 2.5 Flash tutoring grounded in your Google Docs notes, with chat history and `[From Notes]` / `[Added Knowledge]` labels |
 | ✍️ **Log Session** | Log a study session (course, topic, score, time, notes) → appended to your `Performance_Log` sheet |
 | ⚙️ **Performance** | Weak topics (< 60 avg), strong topics, full session log |
+| 🧠 **Learning** | The AI's self-training memory: preferences, 👍/👎 ratings, DO/AVOID corrections, export/restore |
 | 📤 **Export** | One-click CSV download of all performance data |
 
 It runs in **demo mode with sample data** until you add your Google
@@ -91,6 +92,30 @@ Weak topic    = average score below 60
 
 ---
 
+## 🧠 Self-learning AI tutor
+
+The tutor **gets better with every session** by remembering your behaviour —
+entirely free, stored locally as `memory/memory.json` (git-ignored).
+
+- **Rate every answer** 👍 / 👎 after a chat — the tutor tracks your approval.
+- **Correct it** with a note like *"use a circuit diagram"* or *"shorter
+  steps"* — these become DO/AVOID rules.
+- **Set preferences** (style, difficulty, focus) in the AI Tutor tab.
+- **Weak topics** from your performance data are injected into every prompt,
+  so the tutor explains your weakest areas first.
+
+Before each answer, the app builds a **personalization context** and merges it
+into the Gemini system prompt, e.g.:
+
+> *Style: concise. Difficulty: balanced. Primary focus: weak topics. The
+> student is weakest in: Circuit Theory — Transient Analysis, … Learned
+> DO/AVOID rules from past feedback: «always show units».*
+
+The **Learning tab** shows what it has learned and lets you export/restore the
+memory as JSON for backup.
+
+---
+
 ## 🗂 Repository structure
 
 ```
@@ -101,9 +126,11 @@ EEE_Academic_OS/
 │   ├── config.py           # all tunable settings
 │   ├── analytics.py        # pure study analytics (unit-tested)
 │   ├── gemini.py           # AI tutor prompt builder + API call
+│   ├── learning.py         # self-learning tutor memory (preferences, feedback)
 │   ├── services.py         # Google Sheets/Calendar/Docs integration
 │   └── sample_data.py      # deterministic demo data
-├── tests/                  # pytest suite (22 tests)
+├── memory/                 # local tutor memory (git-ignored, exportable)
+├── tests/                  # pytest suite (34 tests)
 ├── .streamlit/config.toml  # dark theme + headless server
 ├── .devcontainer/          # Codespaces setup
 ├── .github/workflows/tests.yml

@@ -105,6 +105,31 @@ Deterministic seeded DataFrame (same shape as the sheet) used whenever secrets
 are missing. Lets the whole app run and be screenshotted without any Google
 account.
 
+### 6. Learning memory (`src/learning.py`)
+
+The AI tutor self-trains through a persistent, exportable JSON memory
+(`memory/memory.json`, git-ignored):
+
+- **Preferences** — style / difficulty / focus set by the user in the tutor tab.
+- **Interactions** — every question + answer + 👍/👎 rating.
+- **Corrections** — DO/AVOID rules extracted from user feedback.
+- **Personalization context** — built before every call and merged into the
+  Gemini system prompt by `gemini.ask_gemini(personalization=...)`, combining
+  preferences, weak topics from `analytics.weak_topics`, recent courses, and
+  learned rules.
+
+```mermaid
+flowchart LR
+    Q[Student asks question] --> PC[Build personalization context]
+    WM[(weak topics from performance)]
+    LM[(tutor memory: prefs/rules/ratings)]
+    PC --> GM[Gemini 2.5 Flash]
+    GM --> A[Answer]
+    A --> FB[Rate 👍/👎 + correction]
+    FB --> LM
+    PC --> LM
+```
+
 ## Deployment
 
 - **Local** — `streamlit run app.py`.
