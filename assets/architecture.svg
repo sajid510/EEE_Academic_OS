@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" font-family="Inter, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0e1a"/>
+      <stop offset="1" stop-color="#0f1525"/>
+    </linearGradient>
+    <linearGradient id="hl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7c6af7"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="box" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a2240"/>
+      <stop offset="1" stop-color="#141c30"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#9d8fff"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="660" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1200" height="70" fill="url(#hl)" opacity="0.9"/>
+  <text x="40" y="44" font-size="26" font-weight="700" fill="#fff">EEE Academic OS</text>
+  <text x="40" y="62" font-size="13" fill="#d8d8f0" opacity="0.85">Hybrid AI tutor + study performance + deadline management · Streamlit</text>
+
+  <!-- Data sources -->
+  <rect x="30" y="120" width="230" height="200" rx="10" fill="url(#box)" stroke="#333" stroke-width="1.5"/>
+  <text x="145" y="150" font-size="15" font-weight="700" fill="#22d3ee" text-anchor="middle">GOOGLE WORKSPACE</text>
+  <text x="145" y="182" font-size="12" fill="#ccc" text-anchor="middle">Sheets — Performance_Log</text>
+  <text x="145" y="200" font-size="11" fill="#888" text-anchor="middle">Date · Course · Topic</text>
+  <text x="145" y="218" font-size="11" fill="#888" text-anchor="middle">Practice Score · Time · Notes</text>
+  <text x="145" y="246" font-size="12" fill="#ccc" text-anchor="middle">Calendar — deadlines</text>
+  <text x="145" y="264" font-size="11" fill="#888" text-anchor="middle">Drive/Docs — study notes</text>
+  <text x="145" y="292" font-size="11" fill="#5f5f8a" text-anchor="middle">service-account credentials</text>
+
+  <!-- App core -->
+  <rect x="310" y="120" width="270" height="200" rx="10" fill="url(#box)" stroke="#7c6af7" stroke-width="1.5"/>
+  <text x="445" y="150" font-size="15" font-weight="700" fill="#7c6af7" text-anchor="middle">STREAMLIT APP (app.py)</text>
+  <text x="445" y="184" font-size="12" fill="#ccc" text-anchor="middle">📊 Dashboard — metrics/charts</text>
+  <text x="445" y="204" font-size="12" fill="#ccc" text-anchor="middle">📅 Deadlines — countdowns</text>
+  <text x="445" y="224" font-size="12" fill="#ccc" text-anchor="middle">🧠 AI Tutor — Gemini chat</text>
+  <text x="445" y="244" font-size="12" fill="#ccc" text-anchor="middle">✍️ Log Session — sheet writer</text>
+  <text x="445" y="264" font-size="12" fill="#ccc" text-anchor="middle">⚙️ Performance — weak topics</text>
+  <text x="445" y="284" font-size="12" fill="#ccc" text-anchor="middle">📤 Export — CSV download</text>
+
+  <!-- Analytics -->
+  <rect x="310" y="350" width="270" height="130" rx="10" fill="url(#box)" stroke="#333" stroke-width="1.5"/>
+  <text x="445" y="380" font-size="14" font-weight="700" fill="#22d3ee" text-anchor="middle">ANALYTICS (src/analytics.py)</text>
+  <text x="445" y="408" font-size="11" fill="#aaa" text-anchor="middle">mastery score · GPA estimate</text>
+  <text x="445" y="426" font-size="11" fill="#aaa" text-anchor="middle">weak/strong topics · trends</text>
+  <text x="445" y="444" font-size="11" fill="#aaa" text-anchor="middle">weekly streak · prep blocks</text>
+
+  <!-- Services -->
+  <rect x="30" y="350" width="230" height="130" rx="10" fill="url(#box)" stroke="#10b981" stroke-width="1.5"/>
+  <text x="145" y="380" font-size="14" font-weight="700" fill="#34d399" text-anchor="middle">SERVICES (src/services.py)</text>
+  <text x="145" y="408" font-size="11" fill="#aaa" text-anchor="middle">read/append sheets</text>
+  <text x="145" y="426" font-size="11" fill="#aaa" text-anchor="middle">calendar events + prep blocks</text>
+  <text x="145" y="444" font-size="11" fill="#aaa" text-anchor="middle">docs notes fetch</text>
+
+  <!-- Gemini -->
+  <rect x="630" y="120" width="260" height="130" rx="10" fill="url(#box)" stroke="#ec4899" stroke-width="1.5"/>
+  <text x="760" y="150" font-size="15" font-weight="700" fill="#ec4899" text-anchor="middle">AI TUTOR (src/gemini.py)</text>
+  <text x="760" y="182" font-size="11" fill="#aaa" text-anchor="middle">Gemini 2.5 Flash generateContent</text>
+  <text x="760" y="200" font-size="11" fill="#aaa" text-anchor="middle">[From Notes] / [Added Knowledge]</text>
+  <text x="760" y="218" font-size="11" fill="#aaa" text-anchor="middle">chat history · error handling</text>
+
+  <!-- Sample data / demo -->
+  <rect x="630" y="280" width="260" height="100" rx="10" fill="url(#box)" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="760" y="310" font-size="13" font-weight="700" fill="#f5a623" text-anchor="middle">DEMO MODE</text>
+  <text x="760" y="334" font-size="11" fill="#aaa" text-anchor="middle">src/sample_data.py — seeded data</text>
+  <text x="760" y="352" font-size="11" fill="#aaa" text-anchor="middle">no Google account required</text>
+
+  <!-- Tests -->
+  <rect x="630" y="410" width="260" height="110" rx="10" fill="url(#box)" stroke="#333" stroke-width="1.5"/>
+  <text x="760" y="440" font-size="13" font-weight="700" fill="#7ec8e3" text-anchor="middle">TESTS + CI</text>
+  <text x="760" y="464" font-size="11" fill="#aaa" text-anchor="middle">pytest — analytics + prompts</text>
+  <text x="760" y="482" font-size="11" fill="#aaa" text-anchor="middle">GitHub Actions (3.10-3.12)</text>
+
+  <!-- Deployment -->
+  <rect x="940" y="120" width="230" height="200" rx="10" fill="url(#box)" stroke="#333" stroke-width="1.5"/>
+  <text x="1055" y="150" font-size="15" font-weight="700" fill="#7ec8e3" text-anchor="middle">RUN ANYWHERE</text>
+  <text x="1055" y="184" font-size="12" fill="#ccc" text-anchor="middle">streamlit run app.py</text>
+  <text x="1055" y="204" font-size="11" fill="#888" text-anchor="middle">local · Codespaces devcontainer</text>
+  <text x="1055" y="224" font-size="11" fill="#888" text-anchor="middle">secrets via .streamlit/secrets.toml</text>
+  <text x="1055" y="252" font-size="11" fill="#888" text-anchor="middle">gcp_service_account</text>
+  <text x="1055" y="270" font-size="11" fill="#888" text-anchor="middle">GEMINI_API_KEY</text>
+
+  <!-- arrows -->
+  <path d="M260 220 L310 220" stroke="#9d8fff" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M445 320 L445 350" stroke="#9d8fff" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M260 415 L310 415" stroke="#9d8fff" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M580 190 L630 190" stroke="#9d8fff" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M580 220 L630 330" stroke="#9d8fff" stroke-width="2" stroke-dasharray="4 4" fill="none" marker-end="url(#arrow)"/>
+  <path d="M940 220 L890 220" stroke="#9d8fff" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <text x="40" y="630" font-size="12" fill="#5f5f8a">EEE Academic OS · Streamlit · pandas · Gemini 2.5 Flash · Google Sheets/Calendar/Docs · gspread · pytest</text>
+</svg>
