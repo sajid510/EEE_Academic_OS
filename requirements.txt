@@ -1,4 +1,4 @@
-# EEE Academic OS — pinned dependencies (tested together)
+# EEE Academic OS — pinned dependencies (Python 3.11+)
 streamlit==1.54.0
 pandas==2.3.3
 numpy==2.4.2
