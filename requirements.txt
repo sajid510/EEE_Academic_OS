@@ -1,8 +1,13 @@
-# EEE Academic OS — pinned dependencies (Python 3.11+)
+# EEE Academic OS — pinned dependencies (Python 3.10–3.13)
+# numpy/pandas/matplotlib are pinned per Python version because the latest
+# releases require Python 3.11+ (no wheels for 3.10).
 streamlit==1.54.0
-pandas==2.3.3
-numpy==2.4.2
-matplotlib==3.10.8
+numpy==2.4.2; python_version >= "3.11"
+numpy==1.26.4; python_version < "3.11"
+pandas==2.3.3; python_version >= "3.11"
+pandas==2.2.2; python_version < "3.11"
+matplotlib==3.10.8; python_version >= "3.11"
+matplotlib==3.9.2; python_version < "3.11"
 requests==2.32.5
 gspread==6.2.1
 google-api-python-client==2.190.0

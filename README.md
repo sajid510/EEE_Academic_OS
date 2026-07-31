@@ -122,7 +122,7 @@ python -m pytest tests/ -q
 ```
 
 The suite covers the analytics core (mastery, GPA, topics, streaks, prep
-blocks) and the AI-tutor prompt builder. CI runs it on Python 3.11–3.12.
+blocks) and the AI-tutor prompt builder. CI runs it on Python 3.10–3.12.
 
 ---
 
